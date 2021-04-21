@@ -14,30 +14,30 @@ import { _firestore } from "../../utils/firebase";
 import { UserContext } from "../../providers/AuthProvider";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-const Dashboard = () => {
+const AlreadyCompletedOrders = () => {
   const { actualUser } = useContext(UserContext);
   const toast = useToast();
   const ordersCollectionRef = _firestore
     .collection("/orders")
     .where("restaurantName", "==", actualUser.restaurantName)
-    .where("completed", "==", false);
+    .where("completed", "==", true);
 
   const [orders] = useCollectionData(ordersCollectionRef);
 
   const completeOrder = async (docID: string) => {
     await _firestore.collection("/orders").doc(`${docID}`).update({
-      completed: true,
+      completed: false,
     }).then(() => toast({
-      title: "Ordine aggiornato come completato",
+      title: "Ordine invertito a 'non completato'",
       isClosable: true,
       duration: 2000,
       position: "top-left",
-      status: "success"
+      status: "info"
     }))
     .catch((error) => {
       console.error(error);
       toast({
-        title: "Non è stato possibile aggiornare l'ordine come completato",
+        title: "Non è stato possibile aggiornare l'ordine",
         isClosable: true,
         duration: 2000,
         position: "top-left",
@@ -47,7 +47,7 @@ const Dashboard = () => {
   }
   return (
     <Box p="4" borderRadius="lg" borderWidth="3px">
-      <Text>Ordini in arrivo:</Text>
+      <Text>Ordini già completati:</Text>
       <Accordion allowToggle>
         {orders ? (
           orders.map((order, id: number) => {
@@ -88,18 +88,17 @@ const Dashboard = () => {
                       })}
                     </AccordionPanel>
                     <Button
-                      bgColor="green.100"
+                      bgColor="orange.100"
                       borderRadius="2xl"
-                      width="10%"
+                      width="30%"
                       onClick={async () => {
                         _firestore.collection("/orders").where("createdAt", "==", createdAt)
                           .get()
                           .then((qs) => qs.forEach((doc) => completeOrder(doc.id)))
                           .catch(console.error);
-
                       }}
                     >
-                      Completa
+                      Inverti come non completato
                     </Button>
                   </AccordionItem>
                 </Box>
@@ -114,4 +113,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AlreadyCompletedOrders;

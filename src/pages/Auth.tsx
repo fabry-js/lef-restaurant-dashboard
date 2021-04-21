@@ -64,6 +64,7 @@ const Auth = () => {
               size="lg"
               name="idAzienda"
               ref={register}
+              autoFocus
             />
             <InputGroup>
               <Input
@@ -75,7 +76,6 @@ const Auth = () => {
                 size="lg"
                 name="password"
                 ref={register}
-                autoFocus
               />
               <InputRightElement width="4.5rem">
                 <Button
